@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff6b93;
+            --primary-dark: #e55a7e;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --info: #2196f3;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #777777;
+            --border: #e0e0e0;
+            --period-color: #ff4757;
+            --prediction-color: #ff9ff3;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.5s ease;
+        }
+
+        .date-display {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .dashboard-header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary), #ff8e53);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 107, 147, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 107, 147, 0.4);
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .tracker-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracker-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .tracker-card h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        /* Meal Tracker Styles */
+        .meal-sessions {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .meal-session {
+            display: flex;
+            flex-direction: column;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        .meal-session label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meal-input {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .meal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 147, 0.1);
+        }
+
+        .meal-submit {
+            margin-top: 8px;
+            align-self: flex-end;
+        }
+
+        /* Water Tracker Styles */
+        .water-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .water-progress {
+            height: 25px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .water-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 12px;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .water-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .water-stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .water-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Sleep Tracker Styles */
+        .sleep-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sleep-input {
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .sleep-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 147, 0.1);
+        }
+
+        /* Tasks Tracker Styles */
+        .tasks-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .tasks-input {
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .tasks-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 147, 0.1);
+        }
+
+        /* Menstrual Cycle Tracker Styles */
+        .period-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .period-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .period-start, .period-end, .period-notes {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .period-start:focus, .period-end:focus, .period-notes:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 147, 0.1);
+        }
+
+        .period-prediction {
+            background: linear-gradient(135deg, rgba(255, 107, 147, 0.1), rgba(255, 142, 83, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 10px;
+            border-left: 4px solid var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        /* Period Calendar Styles */
+        .period-calendar {
+            margin-top: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-nav {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            background: rgba(255, 107, 147, 0.1);
+            border-radius: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 107, 147, 0.1);
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.period-day {
+            background: var(--period-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.predicted-period {
+            background: var(--prediction-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.today {
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .legend-period {
+            background: var(--period-color);
+        }
+
+        .legend-prediction {
+            background: var(--prediction-color);
+        }
+
+        .legend-today {
+            border: 2px solid var(--primary);
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #ff8e53);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 107, 147, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 107, 147, 0.4);
+        }
+
+        .btn-small {
+            padding: 10px 18px;
+            font-size: 14px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #45a049);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .tracker-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .tracker-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+            
+            .dashboard-header {
+                padding: 20px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 24px;
+            }
+            
+            .tracker-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 15px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding: 20px 15px;
+            }
+            
+            .tracker-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .tracker-card {
+                padding: 20px;
+            }
+            
+            .water-controls {
+                flex-wrap: wrap;
+            }
+            
+            .water-controls .btn {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .calendar-grid {
+                gap: 3px;
+            }
+
+            .calendar-day {
+                font-size: 12px;
+                padding: 5px;
+            }
+
+            .calendar-day-header {
+                font-size: 12px;
+                padding: 8px 5px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 22px;
+            }
+            
+            .logout-btn {
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard {
+                padding: 10px;
+            }
+            
+            .dashboard-header {
+                padding: 15px 10px;
+            }
+            
+            .tracker-card {
+                padding: 15px;
+            }
+            
+            .tracker-card h2 {
+                font-size: 18px;
+            }
+            
+            .water-controls {
+                flex-direction: column;
+            }
+            
+            .water-controls .btn {
+                width: 100%;
+            }
+
+            .calendar-legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+            }
+            
+            .meal-input, .sleep-input, .tasks-input, .period-start, .period-end, .period-notes {
+                padding: 10px;
+            }
+            
+            .water-stats {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .dashboard-header h1 {
+                font-size: 18px;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .date-display {
+                font-size: 14px;
+            }
+            
+            .tracker-card h2 {
+                font-size: 16px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .water-controls .btn {
+                min-width: auto;
+            }
+            
+            .calendar-day {
+                font-size: 10px;
+                padding: 3px;
+            }
+            
+            .calendar-day-header {
+                font-size: 10px;
+                padding: 5px 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <header class="dashboard-header">
+        <div>
+            <h1><i class="fas fa-heartbeat"></i> Welcome, {{ user.name }}!</h1>
+            <div class="date-display" id="currentDate"></div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </header>
+
+    <div class="tracker-grid">
+        <!-- Meals Tracker -->
+        <div class="tracker-card">
+            <h2><i class="fas fa-utensils"></i> Daily Meals</h2>
+            <div class="meal-sessions">
+                <div class="meal-session">
+                    <label><i class="fas fa-sun"></i> Breakfast</label>
+                    <textarea class="meal-input" data-session="morning" 
+                              placeholder="What did you eat for breakfast?">{{ today_log.meals.morning }}</textarea>
+                    <button class="btn btn-small meal-submit" onclick="updateMeal('morning')">
+                        <i class="fas fa-check"></i> Save Breakfast
+                    </button>
+                    <div class="last-updated" id="breakfast-time">
+                        {% if today_log.last_updated.breakfast %}Last updated: {{ today_log.last_updated.breakfast }}{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label><i class="fas fa-sun"></i> Lunch</label>
+                    <textarea class="meal-input" data-session="afternoon"
+                              placeholder="What did you eat for lunch?">{{ today_log.meals.afternoon }}</textarea>
+                    <button class="btn btn-small meal-submit" onclick="updateMeal('afternoon')">
+                        <i class="fas fa-check"></i> Save Lunch
+                    </button>
+                    <div class="last-updated" id="lunch-time">
+                        {% if today_log.last_updated.lunch %}Last updated: {{ today_log.last_updated.lunch }}{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label><i class="fas fa-cloud-sun"></i> Evening Snacks</label>
+                    <textarea class="meal-input" data-session="evening"
+                              placeholder="Evening snacks?">{{ today_log.meals.evening }}</textarea>
+                    <button class="btn btn-small meal-submit" onclick="updateMeal('evening')">
+                        <i class="fas fa-check"></i> Save Snacks
+                    </button>
+                    <div class="last-updated" id="evening-time">
+                        {% if today_log.last_updated.evening %}Last updated: {{ today_log.last_updated.evening }}{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label><i class="fas fa-moon"></i> Dinner & Snacks</label>
+                    <textarea class="meal-input" data-session="dinner_snacks"
+                              placeholder="Dinner and any snacks?">{{ today_log.meals.dinner_snacks }}</textarea>
+                    <button class="btn btn-small meal-submit" onclick="updateMeal('dinner_snacks')">
+                        <i class="fas fa-check"></i> Save Dinner
+                    </button>
+                    <div class="last-updated" id="dinner-time">
+                        {% if today_log.last_updated.dinner %}Last updated: {{ today_log.last_updated.dinner }}{% endif %}
+                    </div>
+                </div>
+            </div>
+      
+
+        <!-- Water Tracker -->
+        <div class="tracker-card">
+            <h2><i class="fas fa-tint"></i> Water Intake</h2>
+            <div class="water-tracker">
+                <div class="water-progress">
+                    <div class="water-fill" style="width: {{ water_percentage }}%"></div>
+                </div>
+                <div class="water-stats">
+                    <span>{{ today_log.water_ml }}ml / 4000ml</span>
+                    <span>{{ "%.1f"|format(water_percentage) }}%</span>
+                </div>
+                <div class="water-controls">
+                    <button class="btn btn-small" onclick="addWater(250)">
+                        <i class="fas fa-plus"></i> +250ml
+                    </button>
+                    <button class="btn btn-small" onclick="addWater(500)">
+                        <i class="fas fa-plus"></i> +500ml
+                    </button>
+                    <button class="btn btn-small" onclick="addWater(1000)">
+                        <i class="fas fa-plus"></i> +1000ml
+                    </button>
+                </div>
+                <div class="last-updated" id="water-time">
+                    {% if today_log.last_updated.water %}Last updated: {{ today_log.last_updated.water }}{% endif %}
+                </div>
+            </div>
+        
+
+        <!-- Sleep Tracker -->
+        <div class="tracker-card">
+            <h2><i class="fas fa-bed"></i> Sleep Hours</h2>
+            <div class="sleep-tracker">
+                <input type="number" step="0.1" min="0" max="24" 
+                       value="{{ today_log.sleep_hours }}" 
+                       class="sleep-input" 
+                       placeholder="Hours slept">
+                <button onclick="updateSleep()" class="btn">
+                    <i class="fas fa-moon"></i> Update Sleep
+                </button>
+                <div class="last-updated" id="sleep-time">
+                    {% if today_log.last_updated.sleep %}Last updated: {{ today_log.last_updated.sleep }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Tracker -->
+        <div class="tracker-card">
+            <h2><i class="fas fa-tasks"></i> Daily Tasks</h2>
+            <div class="tasks-tracker">
+                <textarea class="tasks-input" placeholder="What tasks did you complete today?">{{ today_log.tasks }}</textarea>
+                <button onclick="updateTasks()" class="btn">
+                    <i class="fas fa-save"></i> Save Tasks
+                </button>
+                <div class="last-updated" id="tasks-time">
+                    {% if today_log.last_updated.tasks %}Last updated: {{ today_log.last_updated.tasks }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Menstrual Cycle Tracker - Only show for female users -->
+        {% if user.gender == 'female' %}
+        <div class="tracker-card">
+            <h2><i class="fas fa-venus"></i> Menstrual Cycle</h2>
+            <div class="period-tracker">
+                <div class="period-inputs">
+                    <div class="input-group">
+                        <label><i class="fas fa-calendar-day"></i> Period Start</label>
+                        <input type="date" class="period-start" value="{{ today_log.period.start }}">
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fas fa-calendar-check"></i> Period End</label>
+                        <input type="date" class="period-end" value="{{ today_log.period.end }}">
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fas fa-sticky-note"></i> Notes</label>
+                        <input type="text" class="period-notes" value="{{ today_log.period.notes }}" placeholder="Any symptoms?">
+                    </div>
+                </div>
+                <button onclick="updatePeriod()" class="btn">
+                    <i class="fas fa-sync-alt"></i> Update Period
+                </button>
+                <div class="last-updated" id="period-time">
+                    {% if today_log.last_updated.period %}Last updated: {{ today_log.last_updated.period }}{% endif %}
+                </div>
+                
+                {% if next_period_prediction %}
+                <div class="period-prediction">
+                    <strong><i class="fas fa-calendar-alt"></i> Next predicted period: {{ next_period_prediction }}</strong>
+                </div>
+                {% endif %}
+
+               
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Display current date
+    function updateCurrentDate() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // Show notification
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.style.background = type === 'success' ? '#4CAF50' : '#f44336';
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}"></i> ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Get display name for meal type
+    function getMealDisplayName(mealType) {
+        const displayNames = {
+            'morning': 'Breakfast',
+            'afternoon': 'Lunch',
+            'evening': 'Evening Snacks', 
+            'dinner_snacks': 'Dinner'
+        };
+        return displayNames[mealType] || mealType;
+    }
+
+    // Period Calendar functionality
+    let currentCalendarDate = new Date();
+
+    function generateCalendar(year, month, periodDates) {
+        const container = document.getElementById('calendar-container');
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDay = firstDay.getDay();
+        const monthName = firstDay.toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        
+        let calendarHTML = `
+            <div class="calendar-header">
+                <button class="calendar-nav" onclick="previousMonth()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h4>${monthName}</h4>
+                <button class="calendar-nav" onclick="nextMonth()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Sun</div>
+                <div class="calendar-day-header">Mon</div>
+                <div class="calendar-day-header">Tue</div>
+                <div class="calendar-day-header">Wed</div>
+                <div class="calendar-day-header">Thu</div>
+                <div class="calendar-day-header">Fri</div>
+                <div class="calendar-day-header">Sat</div>
+        `;
+        
+        // Empty days before the first day of the month
+        for (let i = 0; i < startingDay; i++) {
+            calendarHTML += '<div class="calendar-day empty"></div>';
+        }
+        
+        // Days of the month
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            let dayClass = 'calendar-day';
+            
+            // Check if today
+            if (dayString === todayString) {
+                dayClass += ' today';
+            }
+            
+            // Check if period day
+            if (periodDates.includes(dayString)) {
+                dayClass += ' period-day';
+            }
+            
+            // Check if predicted period (future dates in periodDates)
+            const dateObj = new Date(dayString);
+            if (dateObj > today && periodDates.includes(dayString)) {
+                dayClass += ' predicted-period';
+            }
+            
+            calendarHTML += `<div class="${dayClass}" data-date="${dayString}">${day}</div>`;
+        }
+        
+        calendarHTML += '</div>';
+        container.innerHTML = calendarHTML;
+    }
+
+    function previousMonth() {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        updateCalendar();
+    }
+
+    function nextMonth() {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        updateCalendar();
+    }
+
+    function updateCalendar() {
+        const periodDates = {{ period_calendar | tojson }};
+        generateCalendar(
+            currentCalendarDate.getFullYear(),
+            currentCalendarDate.getMonth(),
+            periodDates
+        );
+    }
+
+    // Update meal function
+    function updateMeal(mealType) {
+        const input = document.querySelector(`.meal-input[data-session="${mealType}"]`);
+        const timeElement = document.getElementById(`${mealType}-time`);
+        
+        if (!input) {
+            console.error(`Input element for ${mealType} not found`);
+            showNotification('Error: Input element not found', 'error');
+            return;
+        }
+        
+        // Send update to server
+        fetch('/update_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                meals: { [mealType]: input.value },
+                update_type: mealType
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update timestamp
+                if (timeElement) {
+                    timeElement.textContent = `Last updated: ${data.timestamp}`;
+                }
+                showNotification(`${getMealDisplayName(mealType)} saved successfully!`);
+                
+                // Add animation effect
+                input.style.borderColor = '#4CAF50';
+                setTimeout(() => {
+                    input.style.borderColor = '#e0e0e0';
+                }, 1000);
+            } else {
+                showNotification('Failed to save meal: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error saving meal data: ' + error.message, 'error');
+        });
+    }
+
+    // Water intake function
+    function addWater(amount) {
+        const waterStats = document.querySelector('.water-stats span');
+        const waterFill = document.querySelector('.water-fill');
+        const waterPercentage = document.querySelector('.water-stats span:last-child');
+        const timeElement = document.getElementById('water-time');
+        
+        const currentWater = parseInt(waterStats.textContent) || 0;
+        const newWater = currentWater + amount;
+        const percentage = Math.min((newWater / 4000) * 100, 100);
+        
+        // Send update to server
+        fetch('/update_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                water_ml: newWater,
+                update_type: 'water'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update display
+                waterStats.textContent = `${newWater}ml / 4000ml`;
+                waterFill.style.width = `${percentage}%`;
+                waterPercentage.textContent = `${percentage.toFixed(1)}%`;
+                if (timeElement) {
+                    timeElement.textContent = `Last updated: ${data.timestamp}`;
+                }
+                
+                showNotification(`Added ${amount}ml of water!`);
+            } else {
+                showNotification('Failed to update water: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating water: ' + error.message, 'error');
+        });
+    }
+
+    // Update sleep function
+    function updateSleep() {
+        const sleepInput = document.querySelector('.sleep-input');
+        const timeElement = document.getElementById('sleep-time');
+        
+        if (!sleepInput) {
+            showNotification('Error: Sleep input not found', 'error');
+            return;
+        }
+        
+        const sleepHours = parseFloat(sleepInput.value) || 0;
+        
+        fetch('/update_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sleep_hours: sleepHours,
+                update_type: 'sleep'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (timeElement) {
+                    timeElement.textContent = `Last updated: ${data.timestamp}`;
+                }
+                showNotification(`Sleep updated to ${sleepHours} hours!`);
+                
+                // Add animation
+                sleepInput.style.borderColor = '#4CAF50';
+                setTimeout(() => {
+                    sleepInput.style.borderColor = '#e0e0e0';
+                }, 1000);
+            } else {
+                showNotification('Failed to update sleep: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating sleep: ' + error.message, 'error');
+        });
+    }
+
+    // Update tasks function
+    function updateTasks() {
+        const tasksInput = document.querySelector('.tasks-input');
+        const timeElement = document.getElementById('tasks-time');
+        
+        if (!tasksInput) {
+            showNotification('Error: Tasks input not found', 'error');
+            return;
+        }
+        
+        fetch('/update_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tasks: tasksInput.value,
+                update_type: 'tasks'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (timeElement) {
+                    timeElement.textContent = `Last updated: ${data.timestamp}`;
+                }
+                showNotification('Tasks saved successfully!');
+                
+                // Add animation
+                tasksInput.style.borderColor = '#4CAF50';
+                setTimeout(() => {
+                    tasksInput.style.borderColor = '#e0e0e0';
+                }, 1000);
+            } else {
+                showNotification('Failed to save tasks: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error saving tasks: ' + error.message, 'error');
+        });
+    }
+
+    // Update period function
+    function updatePeriod() {
+        const periodStart = document.querySelector('.period-start');
+        const periodEnd = document.querySelector('.period-end');
+        const periodNotes = document.querySelector('.period-notes');
+        const timeElement = document.getElementById('period-time');
+        
+        if (!periodStart || !periodEnd || !periodNotes) {
+            showNotification('Error: Period inputs not found', 'error');
+            return;
+        }
+        
+        fetch('/update_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                period: {
+                    start: periodStart.value,
+                    end: periodEnd.value,
+                    notes: periodNotes.value
+                },
+                update_type: 'period'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (timeElement) {
+                    timeElement.textContent = `Last updated: ${data.timestamp}`;
+                }
+                showNotification('Period information updated!');
+                
+                // Add animation to all period inputs
+                const periodInputs = document.querySelectorAll('.period-start, .period-end, .period-notes');
+                periodInputs.forEach(input => {
+                    input.style.borderColor = '#4CAF50';
+                    setTimeout(() => {
+                        input.style.borderColor = '#e0e0e0';
+                    }, 1000);
+                });
+
+                // Reload page to update calendar predictions
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showNotification('Failed to update period: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating period: ' + error.message, 'error');
+        });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCurrentDate();
+        
+        // Initialize calendar for female users
+        {% if user.gender == 'female' %}
+        updateCalendar();
+        {% endif %}
+    });
+</script>
+</body>
+</html>

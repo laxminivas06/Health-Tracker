@@ -1,0 +1,2608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - Health Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5a52d5;
+            --primary-light: #f0f0ff;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --info: #2196f3;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #777777;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Mobile-First Header */
+        .dashboard-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            animation: slideDown 0.5s ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .date-display {
+            text-align: center;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .dashboard-header h1 {
+            color: var(--primary);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.4);
+        }
+
+        /* Responsive Grid Layout */
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .tracker-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tracker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .tracker-card h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        /* Health Risk Indicators */
+        .health-risk {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border-left: 4px solid;
+            animation: pulse 2s infinite;
+        }
+
+        .health-risk.low {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.2));
+            border-left-color: var(--success);
+        }
+
+        .health-risk.moderate {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.2));
+            border-left-color: var(--warning);
+        }
+
+        .health-risk.high {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.2));
+            border-left-color: var(--danger);
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .risk-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .risk-symptoms, .risk-prevention {
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+
+        .risk-symptoms li, .risk-prevention li {
+            margin-bottom: 5px;
+        }
+
+        /* Sleep Health Section */
+        .sleep-health {
+            margin-top: 15px;
+        }
+
+        .sleep-recommendation {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            margin-top: 10px;
+        }
+
+        /* Water & Hydration Section */
+        .hydration-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid var(--border);
+        }
+
+        .hydration-status {
+            text-align: center;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .hydration-status.hydrated {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.2));
+            border: 2px solid var(--success);
+        }
+
+        .hydration-status.moderate {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.2));
+            border: 2px solid var(--warning);
+        }
+
+        .hydration-status.dehydrated {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.2));
+            border: 2px solid var(--danger);
+        }
+
+        .hydration-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .hydration-message {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .hydration-details {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Water Progress Styles */
+        .water-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .water-progress {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .water-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: var(--radius-sm);
+            transition: width 0.8s ease;
+        }
+
+        .water-stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Sleep Overview Styles */
+        .sleep-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sleep-display {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border: 2px solid var(--border);
+            color: var(--primary);
+        }
+
+        /* Period Delay Indicator */
+        .period-delay {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.2));
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border-left: 4px solid #ff6b6b;
+            margin: 15px 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        .delay-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+
+        /* Enhanced Calendar Styles */
+        .enhanced-calendar {
+            margin-top: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .calendar-title {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 8px 4px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            position: relative;
+            transition: var(--transition);
+            background: white;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .calendar-day.today {
+            border-color: var(--primary);
+            font-weight: bold;
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .calendar-day.period-day {
+            background: #ff4757;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.predicted-period {
+            background: #ff9ff3;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.delayed-period {
+            background: #ff6b6b;
+            color: white;
+            font-weight: bold;
+            animation: blink 2s infinite;
+        }
+
+        .calendar-day.current-period {
+            background: linear-gradient(45deg, #ff4757, #ff9ff3);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
+        }
+
+        .day-number {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .day-indicator {
+            position: absolute;
+            bottom: 2px;
+            font-size: 8px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 2px;
+            padding: 1px 3px;
+            color: #333;
+        }
+
+        .cycle-indicator {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 8px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Meal Planner Styles */
+        .meal-planner {
+            margin-top: 20px;
+        }
+
+        .planner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .planner-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--success), #3d8b40);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(61, 139, 64, 0.3);
+        }
+
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .week-nav-btn {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .week-nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .current-week {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .meal-plan-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .meal-day {
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-name {
+            font-size: 16px;
+        }
+
+        .day-date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .meals-container {
+            padding: 15px;
+        }
+
+        .meal-category {
+            margin-bottom: 15px;
+        }
+
+        .meal-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .meal-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .meal-icon {
+            font-size: 16px;
+        }
+
+        .meal-content {
+            background: white;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .gender-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .male-badge {
+            background: rgba(33, 150, 243, 0.2);
+            color: #1976d2;
+        }
+
+        .female-badge {
+            background: rgba(233, 30, 99, 0.2);
+            color: #c2185b;
+        }
+
+        /* Cycle Timeline */
+        .cycle-timeline {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .timeline-months {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .timeline-month {
+            min-width: 100px;
+            padding: 8px;
+            background: white;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .timeline-month.current {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .timeline-month-name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+
+        .timeline-period-dates {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .timeline-period-dates.highlight {
+            color: #ff4757;
+            font-weight: 600;
+        }
+
+        /* Enhanced Legend */
+        .enhanced-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-updated {
+            background-color: var(--success);
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+        }
+
+        /* Meal Overview Styles */
+        .meal-sessions.read-only {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .meal-session {
+            display: flex;
+            flex-direction: column;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        .meal-session label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meal-text {
+            background: var(--light-bg);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            min-height: 70px;
+            border: 2px solid var(--border);
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        /* Tasks Overview Styles */
+        .tasks-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tasks-text {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            min-height: 100px;
+            border: 2px solid var(--border);
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        /* Period Overview Styles */
+        .period-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .period-info {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+        }
+
+        .period-info div {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .period-prediction {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(90, 82, 213, 0.1));
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            margin-top: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes cardSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -468px 0;
+            }
+            100% {
+                background-position: 468px 0;
+            }
+        }
+
+        /* Color variations for different cycle numbers */
+        .cycle-1 { background: #ff6b6b !important; }
+        .cycle-2 { background: #ff9ff3 !important; }
+        .cycle-3 { background: #f368e0 !important; }
+        .cycle-4 { background: #ff9f43 !important; }
+        .cycle-5 { background: #ee5253 !important; }
+        .cycle-6 { background: #ff9f43 !important; }
+
+        /* Meal Planner Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 95%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(30px);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            background: var(--light-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-download-btn {
+            background: linear-gradient(135deg, var(--success), #3d8b40);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(61, 139, 64, 0.3);
+        }
+
+        .modal-week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-week-nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-week-nav-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .modal-current-week {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .modal-meal-plan-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .modal-meal-day {
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            overflow: hidden;
+        }
+
+        .modal-day-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-day-name {
+            font-size: 18px;
+        }
+
+        .modal-day-date {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .modal-meals-container {
+            padding: 20px;
+        }
+
+        .modal-meal-category {
+            margin-bottom: 20px;
+        }
+
+        .modal-meal-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-meal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .modal-meal-icon {
+            font-size: 18px;
+        }
+
+        .modal-meal-content {
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 640px) {
+            .dashboard-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .tracker-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .meal-plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-meal-plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 24px;
+            }
+            
+            .tracker-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .meal-plan-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .modal-meal-plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .tracker-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+                grid-auto-flow: dense;
+                grid-template-areas: 
+                    "sleep water meals"
+                    "tasks tasks planner"
+                    "period period period";
+            }
+            
+            .sleep-card { grid-area: sleep; }
+            .water-card { grid-area: water; }
+            .meals-card { grid-area: meals; }
+            .tasks-card { grid-area: tasks; }
+            .planner-card { grid-area: planner; }
+            .period-card { grid-area: period; }
+            
+            .meal-plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-meal-plan-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .tracker-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-areas: 
+                    "sleep water meals tasks"
+                    "planner planner planner planner"
+                    "period period period period";
+            }
+            
+            .planner-card {
+                grid-column: span 4;
+            }
+            
+            .period-card {
+                grid-column: span 4;
+            }
+            
+            .meal-plan-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .modal-meal-plan-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard {
+                padding: 10px;
+            }
+            
+            .dashboard-header {
+                padding: 12px;
+            }
+            
+            .tracker-card {
+                padding: 12px;
+            }
+            
+            .tracker-card h2 {
+                font-size: 16px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 18px;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+
+            .calendar-day {
+                font-size: 10px;
+            }
+
+            .calendar-day-header {
+                font-size: 10px;
+            }
+
+            .timeline-month {
+                min-width: 80px;
+                padding: 4px;
+            }
+
+            .timeline-month-name {
+                font-size: 12px;
+            }
+
+            .timeline-period-dates {
+                font-size: 10px;
+            }
+
+            .hydration-message {
+                font-size: 14px;
+            }
+
+            .hydration-icon {
+                font-size: 28px;
+            }
+
+            .risk-content {
+                font-size: 12px;
+            }
+
+            .sleep-display {
+                padding: 15px;
+                font-size: 18px;
+            }
+
+            .water-stats {
+                font-size: 14px;
+            }
+
+            .calendar-header {
+                padding: 8px 10px;
+            }
+
+            .calendar-title {
+                font-size: 14px;
+            }
+
+            .nav-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .planner-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .planner-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .day-header {
+                padding: 10px 12px;
+            }
+
+            .day-name {
+                font-size: 14px;
+            }
+
+            .day-date {
+                font-size: 12px;
+            }
+
+            .modal-header {
+                padding: 15px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 15px;
+            }
+
+            .modal-footer {
+                padding: 10px 15px;
+            }
+
+            .modal-day-header {
+                padding: 12px 15px;
+            }
+
+            .modal-day-name {
+                font-size: 16px;
+            }
+
+            .modal-day-date {
+                font-size: 14px;
+            }
+
+            .modal-meals-container {
+                padding: 15px;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 800px 104px;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: var(--radius-sm);
+            min-height: 100px;
+        }
+
+        /* React-like Card Components */
+        .card-component {
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: white;
+            padding: 20px;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-component::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card-component:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-item.active {
+            color: var(--primary);
+        }
+
+        .mobile-nav-item i {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: block;
+            }
+            
+            .dashboard {
+                padding-bottom: 70px;
+            }
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 1000px;
+        }
+
+        /* Swipeable Cards for Mobile */
+        .swipe-container {
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            gap: 15px;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .swipe-card {
+            min-width: 85%;
+            scroll-snap-align: start;
+        }
+
+        @media (max-width: 768px) {
+            .swipe-container {
+                display: flex;
+            }
+            
+            .tracker-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Cycle Settings Section */
+        .cycle-settings {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            margin-top: 15px;
+        }
+
+        .cycle-setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .cycle-setting-label {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cycle-setting-value {
+            font-weight: 600;
+            color: var(--primary);
+            padding: 5px 10px;
+            background: white;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .cycle-explanation {
+            background: rgba(108, 99, 255, 0.1);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-top: 10px;
+            font-size: 14px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Cycle Analysis Section */
+        .cycle-analysis {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            margin-top: 15px;
+        }
+
+        .analysis-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .analysis-label {
+            font-weight: 600;
+        }
+
+        .analysis-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .analysis-note {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <header class="dashboard-header">
+        <div class="header-top">
+            <h1><i class="fas fa-user-shield"></i> Parent Dashboard of {{ user.name }}!</h1>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+        <div class="date-display" id="currentDate"></div>
+    </header>
+
+    <div class="tracker-grid">
+        <!-- Sleep Health Card -->
+        <div class="tracker-card card-component sleep-card">
+            <h2><i class="fas fa-bed"></i> Sleep Health</h2>
+            <div class="sleep-overview">
+                <div class="sleep-display">
+                    {{ today_log.sleep_hours or '0' }} hours
+                </div>
+                <div class="last-updated">
+                    {% if today_log.last_updated.sleep %}Last updated: {{ today_log.last_updated.sleep }}
+                    {% else %}Not updated today{% endif %}
+                </div>
+                
+                <!-- Sleep Health Risk Assessment -->
+                <div id="sleep-risk-assessment">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+
+                <div class="sleep-recommendation">
+                    <h4><i class="fas fa-lightbulb"></i> Sleep Recommendations</h4>
+                    <p>Teenagers (13-18 years) need 8-10 hours of sleep per night for optimal health and development.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water & Hydration Card -->
+        <div class="tracker-card card-component water-card">
+            <h2><i class="fas fa-tint"></i> Water Intake & Hydration</h2>
+            <div class="water-tracker">
+                <div class="water-progress">
+                    <div class="water-fill" style="width: {{ water_percentage }}%"></div>
+                </div>
+                <div class="water-stats">
+                    <span>{{ today_log.water_ml }}ml / 4000ml</span>
+                    <span>{{ "%.1f"|format(water_percentage) }}%</span>
+                </div>
+                <div class="last-updated">
+                    {% if today_log.last_updated.water %}Last updated: {{ today_log.last_updated.water }}
+                    {% else %}Not updated today{% endif %}
+                </div>
+            </div>
+
+            <!-- Hydration Status -->
+            <div class="hydration-section">
+                <div id="hydration-status" class="hydration-status">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Meals Overview -->
+        <div class="tracker-card card-component meals-card">
+            <h2><i class="fas fa-utensils"></i> Today's Meals</h2>
+            <div class="meal-sessions read-only">
+                <div class="meal-session">
+                    <label>
+                        <i class="fas fa-sun status-indicator 
+                            {% if today_log.last_updated.breakfast %}status-updated{% else %}status-pending{% endif %}">
+                        </i> Breakfast
+                    </label>
+                    <div class="meal-text">{{ today_log.meals.morning or 'No entry yet' }}</div>
+                    <div class="last-updated">
+                        {% if today_log.last_updated.breakfast %}Last updated: {{ today_log.last_updated.breakfast }}
+                        {% else %}Not updated today{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label>
+                        <i class="fas fa-sun status-indicator 
+                            {% if today_log.last_updated.lunch %}status-updated{% else %}status-pending{% endif %}">
+                        </i> Lunch
+                    </label>
+                    <div class="meal-text">{{ today_log.meals.afternoon or 'No entry yet' }}</div>
+                    <div class="last-updated">
+                        {% if today_log.last_updated.lunch %}Last updated: {{ today_log.last_updated.lunch }}
+                        {% else %}Not updated today{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label>
+                        <i class="fas fa-cloud-sun status-indicator 
+                            {% if today_log.last_updated.evening %}status-updated{% else %}status-pending{% endif %}">
+                        </i> Evening Snacks
+                    </label>
+                    <div class="meal-text">{{ today_log.meals.evening or 'No entry yet' }}</div>
+                    <div class="last-updated">
+                        {% if today_log.last_updated.evening %}Last updated: {{ today_log.last_updated.evening }}
+                        {% else %}Not updated today{% endif %}
+                    </div>
+                </div>
+                <div class="meal-session">
+                    <label>
+                        <i class="fas fa-moon status-indicator 
+                            {% if today_log.last_updated.dinner %}status-updated{% else %}status-pending{% endif %}">
+                        </i> Dinner & Snacks
+                    </label>
+                    <div class="meal-text">{{ today_log.meals.dinner_snacks or 'No entry yet' }}</div>
+                    <div class="last-updated">
+                        {% if today_log.last_updated.dinner %}Last updated: {{ today_log.last_updated.dinner }}
+                        {% else %}Not updated today{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Overview -->
+        <div class="tracker-card card-component tasks-card">
+            <h2><i class="fas fa-tasks"></i> Completed Tasks</h2>
+            <div class="tasks-overview">
+                <div class="tasks-text">{{ today_log.tasks or 'No tasks recorded today' }}</div>
+                <div class="last-updated">
+                    {% if today_log.last_updated.tasks %}Last updated: {{ today_log.last_updated.tasks }}
+                    {% else %}Not updated today{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Planner Card -->
+        <div class="tracker-card card-component planner-card">
+            <h2><i class="fas fa-clipboard-list"></i> Weekly Meal Planner</h2>
+            <div class="meal-planner">
+                <div class="planner-header">
+                    <h3>📌 1-Week Balanced Diet Plan</h3>
+                    <div class="planner-actions">
+                        <div class="user-gender">
+                            <strong>Showing plan for:</strong> 
+                            <span class="gender-badge {% if user.gender == 'male' %}male-badge{% else %}female-badge{% endif %}">
+                                {{ user.gender|title }}
+                            </span>
+                        </div>
+                        <button class="download-btn" id="download-plan">
+                            <i class="fas fa-download"></i> Download Plan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="week-navigation">
+                    <button class="week-nav-btn" id="prev-week">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="current-week" id="current-week">Week of June 12, 2023</div>
+                    <button class="week-nav-btn" id="next-week">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="meal-plan-grid" id="meal-plan-grid">
+                    <!-- Dynamic meal plan will be inserted here -->
+                </div>
+
+                <!-- View Full Plan Button -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="download-btn" id="view-full-plan">
+                        <i class="fas fa-expand"></i> View Full Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menstrual Cycle Overview - Only show for female users -->
+        {% if user.gender == 'female' %}
+        <div class="tracker-card card-component period-card">
+            <h2><i class="fas fa-venus"></i> Menstrual Cycle</h2>
+            <div class="period-overview">
+                <div class="period-info">
+                    <div>
+                        <i class="fas fa-calendar-day"></i>
+                        <strong>Current Period:</strong> 
+                        {% if today_log.period.start %}
+                            {{ today_log.period.start }} to {{ today_log.period.end or 'Ongoing' }}
+                        {% else %}
+                            No active period
+                        {% endif %}
+                    </div>
+                    {% if today_log.period.notes %}
+                    <div>
+                        <i class="fas fa-sticky-note"></i>
+                        <strong>Notes:</strong> {{ today_log.period.notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="last-updated">
+                    {% if today_log.last_updated.period %}Last updated: {{ today_log.last_updated.period }}
+                    {% else %}Not updated today{% endif %}
+                </div>
+                
+                <!-- Period Delay Warning -->
+                <div id="period-delay-warning">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+                
+                {% if next_period_prediction %}
+                <div class="period-prediction">
+                    <strong><i class="fas fa-calendar-alt"></i> Next predicted period: {{ next_period_prediction }}</strong>
+                </div>
+                {% endif %}
+
+                <!-- Cycle Settings -->
+                <div class="cycle-settings">
+                    <h3><i class="fas fa-cog"></i> Cycle Settings</h3>
+                    <div class="cycle-setting-item">
+                        <span class="cycle-setting-label">Average Cycle Length:</span>
+                        <span class="cycle-setting-value">{{ cycle_length }} days</span>
+                    </div>
+                    <div class="cycle-setting-item">
+                        <span class="cycle-setting-label">Average Period Duration:</span>
+                        <span class="cycle-setting-value">{{ period_duration }} days</span>
+                    </div>
+                    <div class="cycle-setting-item">
+                        <span class="cycle-setting-label">Last Period Start:</span>
+                        <span class="cycle-setting-value">{{ last_period_start }}</span>
+                    </div>
+                    <div class="cycle-explanation">
+                        <strong>How it works:</strong> The algorithm calculates your next period by adding your average cycle length to the start date of your last period. It then predicts future periods based on this pattern.
+                    </div>
+                </div>
+
+                <!-- Enhanced Period Calendar -->
+                <div class="enhanced-calendar">
+                    <h3><i class="fas fa-calendar-alt"></i> Period Calendar</h3>
+                    
+                    <!-- Calendar Navigation -->
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="prev-month">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="nav-btn" id="today-btn">
+                                <i class="fas fa-calendar-day"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-title" id="calendar-title"></div>
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="next-month">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Dynamic calendar will be inserted here -->
+                    </div>
+
+                    <!-- Enhanced Legend -->
+                    <div class="enhanced-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff4757;"></div>
+                            <span>Current Period</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff9ff3;"></div>
+                            <span>Predicted Period</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff6b6b;"></div>
+                            <span>Delayed Period</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="border: 2px solid var(--primary); background: transparent;"></div>
+                            <span>Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Meal Planner Modal -->
+<div class="modal-overlay" id="meal-planner-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-clipboard-list"></i> Weekly Meal Planner
+            </div>
+            <button class="modal-close" id="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-week-navigation">
+                <button class="modal-week-nav-btn" id="modal-prev-week">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="modal-current-week" id="modal-current-week">Week of June 12, 2023</div>
+                <button class="modal-week-nav-btn" id="modal-next-week">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="modal-meal-plan-grid" id="modal-meal-plan-grid">
+                <!-- Dynamic modal meal plan will be inserted here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-download-btn" id="modal-download-plan">
+                <i class="fas fa-download"></i> Download Plan
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Display current date
+    function updateCurrentDate() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // Calculate sleep health risk
+    function calculateSleepRisk(sleepHours) {
+        if (sleepHours >= 8) {
+            return {
+                level: 'low',
+                title: 'Healthy Sleep Pattern',
+                message: 'Your child is getting adequate sleep for their age group.',
+                icon: 'fas fa-check-circle',
+                color: 'var(--success)',
+                risks: [],
+                recommendations: ['Maintain this sleep schedule', 'Keep consistent bedtimes']
+            };
+        } else if (sleepHours >= 6) {
+            return {
+                level: 'moderate',
+                title: 'Mild Sleep Deprivation',
+                message: 'Your child may experience some daytime sleepiness.',
+                icon: 'fas fa-exclamation-circle',
+                color: 'var(--warning)',
+                risks: [
+                    'Daytime fatigue and sleepiness',
+                    'Difficulty concentrating',
+                    'Mood swings and irritability',
+                    'Weakened immune system'
+                ],
+                recommendations: [
+                    'Aim for 8-10 hours of sleep',
+                    'Establish a consistent bedtime routine',
+                    'Limit screen time before bed',
+                    'Create a dark, quiet sleep environment'
+                ],
+                diseases: ['Increased risk of: Obesity, Diabetes, Cardiovascular issues']
+            };
+        } else {
+            return {
+                level: 'high',
+                title: 'Severe Sleep Deprivation',
+                message: 'Immediate attention needed - this can affect physical and mental health.',
+                icon: 'fas fa-exclamation-triangle',
+                color: 'var(--danger)',
+                risks: [
+                    'Impaired cognitive function',
+                    'Memory problems',
+                    'Weakened immune system',
+                    'Hormonal imbalances',
+                    'Increased stress and anxiety',
+                    'Poor academic performance'
+                ],
+                recommendations: [
+                    'Consult a healthcare provider',
+                    'Implement strict sleep schedule',
+                    'Remove electronic devices from bedroom',
+                    'Practice relaxation techniques before bed'
+                ],
+                diseases: [
+                    'High risk of: Chronic fatigue syndrome',
+                    'Increased susceptibility to infections',
+                    'Mental health disorders (anxiety, depression)',
+                    'Metabolic disorders',
+                    'Cardiovascular diseases'
+                ]
+            };
+        }
+    }
+
+    // Update sleep risk assessment
+    function updateSleepRiskAssessment() {
+        const sleepHours = {{ today_log.sleep_hours or 0 }};
+        const risk = calculateSleepRisk(sleepHours);
+        
+        const assessmentElement = document.getElementById('sleep-risk-assessment');
+        assessmentElement.className = `health-risk ${risk.level}`;
+        
+        let risksHTML = '';
+        if (risk.risks.length > 0) {
+            risksHTML = `
+                <div class="risk-symptoms">
+                    <strong>Symptoms to watch for:</strong>
+                    <ul>
+                        ${risk.risks.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        let diseasesHTML = '';
+        if (risk.diseases && risk.diseases.length > 0) {
+            diseasesHTML = `
+                <div class="risk-prevention" style="margin-top: 10px;">
+                    <strong style="color: var(--danger);">⚠️ Health Risks:</strong>
+                    <ul>
+                        ${risk.diseases.map(d => `<li>${d}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        let recommendationsHTML = '';
+        if (risk.recommendations.length > 0) {
+            recommendationsHTML = `
+                <div class="risk-prevention">
+                    <strong>Recommendations:</strong>
+                    <ul>
+                        ${risk.recommendations.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        assessmentElement.innerHTML = `
+            <div class="risk-header" style="color: ${risk.color}">
+                <i class="${risk.icon}"></i>
+                <span>${risk.title}</span>
+            </div>
+            <div class="risk-content">
+                <p>${risk.message}</p>
+                ${risksHTML}
+                ${diseasesHTML}
+                ${recommendationsHTML}
+            </div>
+        `;
+    }
+
+    // Calculate hydration status based on water intake
+    function calculateHydrationStatus(waterIntake) {
+        const target = 4000; // 4 liters target
+        const percentage = (waterIntake / target) * 100;
+        
+        if (percentage >= 80) {
+            return {
+                status: 'hydrated',
+                message: 'Excellent Hydration! 🎉',
+                description: 'Your child is well hydrated. Keep up the good work!',
+                icon: 'fas fa-check-circle',
+                color: 'var(--success)'
+            };
+        } else if (percentage >= 50) {
+            return {
+                status: 'moderate',
+                message: 'Moderately Hydrated 👍',
+                description: 'Your child is doing okay, but could drink more water throughout the day.',
+                icon: 'fas fa-exclamation-circle',
+                color: 'var(--warning)'
+            };
+        } else {
+            return {
+                status: 'dehydrated',
+                message: 'Needs More Water 💧',
+                description: 'Your child should drink more water to maintain proper hydration.',
+                icon: 'fas fa-exclamation-triangle',
+                color: 'var(--danger)'
+            };
+        }
+    }
+
+    // Update hydration display
+    function updateHydrationDisplay() {
+        const waterIntake = {{ today_log.water_ml }};
+        const hydration = calculateHydrationStatus(waterIntake);
+        
+        const statusElement = document.getElementById('hydration-status');
+        statusElement.className = `hydration-status ${hydration.status}`;
+        statusElement.innerHTML = `
+            <div class="hydration-icon" style="color: ${hydration.color}">
+                <i class="${hydration.icon}"></i>
+            </div>
+            <div class="hydration-message">${hydration.message}</div>
+            <div class="hydration-details">${hydration.description}</div>
+        `;
+    }
+
+    // Calculate period delay
+    function calculatePeriodDelay() {
+        const nextPredicted = "{{ next_period_prediction }}";
+        if (!nextPredicted || nextPredicted === "Need more data for prediction") {
+            return null;
+        }
+        
+        const predictedDate = new Date(nextPredicted);
+        const today = new Date();
+        const delayDays = Math.floor((today - predictedDate) / (1000 * 60 * 60 * 24));
+        
+        if (delayDays > 0) {
+            return {
+                days: delayDays,
+                level: delayDays > 7 ? 'high' : delayDays > 3 ? 'moderate' : 'low',
+                message: `Period is ${delayDays} day${delayDays > 1 ? 's' : ''} late`,
+                recommendations: [
+                    'Monitor for stress levels',
+                    'Ensure adequate nutrition',
+                    'Maintain healthy sleep patterns',
+                    'Consider pregnancy test if sexually active',
+                    'Consult doctor if delay exceeds 2 weeks'
+                ]
+            };
+        }
+        return null;
+    }
+
+    // Update period delay warning
+    function updatePeriodDelayWarning() {
+        const delay = calculatePeriodDelay();
+        const warningElement = document.getElementById('period-delay-warning');
+        
+        if (delay) {
+            let riskLevel = '';
+            let icon = '';
+            
+            if (delay.level === 'high') {
+                riskLevel = 'high';
+                icon = 'fas fa-exclamation-triangle';
+            } else if (delay.level === 'moderate') {
+                riskLevel = 'moderate';
+                icon = 'fas fa-exclamation-circle';
+            } else {
+                riskLevel = 'low';
+                icon = 'fas fa-info-circle';
+            }
+            
+            warningElement.innerHTML = `
+                <div class="period-delay">
+                    <div class="delay-header">
+                        <i class="${icon}"></i>
+                        <span>${delay.message}</span>
+                    </div>
+                    <div class="risk-content">
+                        <p><strong>Recommendations:</strong></p>
+                        <ul>
+                            ${delay.recommendations.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        } else {
+            warningElement.innerHTML = '';
+        }
+    }
+
+    // Enhanced Calendar Functionality
+    let currentCalendarDate = new Date();
+    
+    function generateCalendar(date, periodDates) {
+        const calendarTitle = document.getElementById('calendar-title');
+        const calendarGrid = document.getElementById('calendar-grid');
+        
+        // Set calendar title
+        const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        calendarTitle.textContent = monthName;
+        
+        // Get first day of month and number of days
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        
+        // Clear previous calendar
+        calendarGrid.innerHTML = '';
+        
+        // Add day headers
+        const dayHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        dayHeaders.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day-header';
+            dayElement.textContent = day;
+            calendarGrid.appendChild(dayElement);
+        });
+        
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < startingDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day empty';
+            calendarGrid.appendChild(emptyDay);
+        }
+        
+        // Add days of the month
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dayElement = document.createElement('div');
+            const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            dayElement.className = 'calendar-day';
+            dayElement.innerHTML = `<div class="day-number">${day}</div>`;
+            
+            // Check if today
+            if (dateString === todayString) {
+                dayElement.classList.add('today');
+            }
+            
+            // Check for period dates
+            const periodInfo = periodDates.find(p => p.date === dateString);
+            if (periodInfo) {
+                const periodDate = new Date(dateString);
+                const isPast = periodDate < today;
+                const isCurrent = periodDate.toDateString() === today.toDateString();
+                const isFuture = periodDate > today;
+                
+                if (isCurrent) {
+                    dayElement.classList.add('current-period');
+                    dayElement.innerHTML += `<div class="day-indicator">Current</div>`;
+                } else if (isPast) {
+                    dayElement.classList.add('period-day');
+                    dayElement.innerHTML += `<div class="day-indicator">Past</div>`;
+                } else if (isFuture) {
+                    dayElement.classList.add('predicted-period');
+                    dayElement.innerHTML += `<div class="cycle-indicator">${periodInfo.cycle_number}</div>`;
+                    dayElement.innerHTML += `<div class="day-indicator">Predicted</div>`;
+                }
+                
+                // Check for delay
+                const nextPredicted = "{{ next_period_prediction }}";
+                if (nextPredicted && dateString === nextPredicted && periodDate <= today) {
+                    dayElement.classList.add('delayed-period');
+                    dayElement.innerHTML += `<div class="day-indicator">Delayed</div>`;
+                }
+                
+                // Add cycle-specific class for color variation
+                if (periodInfo.cycle_number) {
+                    dayElement.classList.add(`cycle-${Math.min(periodInfo.cycle_number, 6)}`);
+                }
+            }
+            
+            calendarGrid.appendChild(dayElement);
+        }
+    }
+    
+    function navigateCalendar(direction) {
+        if (direction === 'prev') {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        } else if (direction === 'next') {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        } else if (direction === 'today') {
+            currentCalendarDate = new Date();
+        }
+        
+        const periodDates = {{ period_calendar | tojson }};
+        generateCalendar(currentCalendarDate, periodDates);
+    }
+
+    // Initialize enhanced calendar
+    function initEnhancedCalendar() {
+        const periodDates = {{ period_calendar | tojson }};
+        generateCalendar(currentCalendarDate, periodDates);
+        
+        // Add event listeners for navigation
+        document.getElementById('prev-month').addEventListener('click', () => navigateCalendar('prev'));
+        document.getElementById('next-month').addEventListener('click', () => navigateCalendar('next'));
+        document.getElementById('today-btn').addEventListener('click', () => navigateCalendar('today'));
+    }
+
+    // Meal Planner Functionality
+    const mealPlans = {
+        male: {
+            monday: {
+                morning: "Oats with milk + banana + almonds",
+                lunch: "Brown rice + dal + chicken curry + salad",
+                evening: "Sprouts + green tea",
+                dinner: "Chapati + paneer curry + curd"
+            },
+            tuesday: {
+                morning: "Poha with peanuts + milk",
+                lunch: "Chapati + rajma curry + cucumber salad",
+                evening: "Peanut chaat + buttermilk",
+                dinner: "Rice + fish curry + stir-fried vegetables"
+            },
+            wednesday: {
+                morning: "2 boiled eggs + whole wheat toast + orange juice",
+                lunch: "Rice + dal tadka + chicken tikka + salad",
+                evening: "Fruit smoothie + dry fruits",
+                dinner: "Chapati + egg curry + spinach sabzi"
+            },
+            thursday: {
+                morning: "Vegetable sandwich + milk",
+                lunch: "Chapati + chole curry + salad",
+                evening: "Sweet corn + buttermilk",
+                dinner: "Rice + grilled chicken + dal + curd"
+            },
+            friday: {
+                morning: "Vegetable paratha + curd",
+                lunch: "Rice + dal makhani + chicken curry + salad",
+                evening: "Peanut butter toast + milk",
+                dinner: "Chapati + fish curry + curd"
+            },
+            saturday: {
+                morning: "Poha + boiled egg + milk",
+                lunch: "Rice + dal fry + mutton curry (optional) + salad",
+                evening: "Sprouts + lemon water",
+                dinner: "Chapati + paneer bhurji + spinach sabzi"
+            },
+            sunday: {
+                morning: "Masala dosa + chutney + milk",
+                lunch: "Veg pulao + dal fry + grilled chicken + salad",
+                evening: "Fruit juice + dry fruits",
+                dinner: "Chapati + egg curry + vegetable stir-fry"
+            }
+        },
+        female: {
+            monday: {
+                morning: "Vegetable upma + boiled egg",
+                lunch: "Rice + dal + sabzi + curd",
+                evening: "Fruit bowl + walnuts",
+                dinner: "Roti + palak paneer + vegetable soup"
+            },
+            tuesday: {
+                morning: "Idli + sambar + chutney",
+                lunch: "Brown rice + dal + bhindi fry + curd",
+                evening: "Roasted chana + green tea",
+                dinner: "Roti + mixed vegetable curry + curd"
+            },
+            wednesday: {
+                morning: "Dosa + chutney + sambar",
+                lunch: "Rice + dal + aloo beans sabzi + salad",
+                evening: "Apple slices + green tea",
+                dinner: "Roti + paneer butter masala (light) + soup"
+            },
+            thursday: {
+                morning: "Upma + boiled sprouts",
+                lunch: "Brown rice + dal + lauki sabzi + salad",
+                evening: "Fruit bowl + lemon tea",
+                dinner: "Roti + soya curry + spinach soup"
+            },
+            friday: {
+                morning: "Idli + sambar + milk",
+                lunch: "Chapati + rajma + sabzi + curd",
+                evening: "Papaya bowl + nuts",
+                dinner: "Roti + vegetable korma + soup"
+            },
+            saturday: {
+                morning: "Vegetable oats + green tea",
+                lunch: "Brown rice + dal + tinda sabzi + curd",
+                evening: "Fruit chaat + tea",
+                dinner: "Roti + palak paneer + soup"
+            },
+            sunday: {
+                morning: "Upma + boiled egg + green tea",
+                lunch: "Veg pulao + dal + pumpkin curry + salad",
+                evening: "Roasted peanuts + fruit bowl",
+                dinner: "Roti + vegetable curry + curd"
+            }
+        }
+    };
+
+    let currentWeekStart = new Date();
+    // Set to Monday of current week
+    currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay() + 1);
+
+    function generateMealPlan() {
+        const userGender = "{{ user.gender }}";
+        const planGrid = document.getElementById('meal-plan-grid');
+        const currentWeekElement = document.getElementById('current-week');
+        
+        // Set current week display
+        const weekEnd = new Date(currentWeekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        currentWeekElement.textContent = `Week of ${currentWeekStart.toLocaleDateString('en-US', options)}`;
+        
+        // Clear previous plan
+        planGrid.innerHTML = '';
+        
+        // Generate meal plan for each day
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        days.forEach((day, index) => {
+            const currentDate = new Date(currentWeekStart);
+            currentDate.setDate(currentDate.getDate() + index);
+            
+            const dayElement = document.createElement('div');
+            dayElement.className = 'meal-day';
+            
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'day-header';
+            
+            const dayName = document.createElement('div');
+            dayName.className = 'day-name';
+            dayName.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            
+            const dayDate = document.createElement('div');
+            dayDate.className = 'day-date';
+            dayDate.textContent = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            dayHeader.appendChild(dayName);
+            dayHeader.appendChild(dayDate);
+            
+            const mealsContainer = document.createElement('div');
+            mealsContainer.className = 'meals-container';
+            
+            // Add meals for the day
+            const meals = mealPlans[userGender][day];
+            const mealTypes = [
+                { key: 'morning', icon: 'fas fa-sun', title: 'Breakfast' },
+                { key: 'lunch', icon: 'fas fa-utensils', title: 'Lunch' },
+                { key: 'evening', icon: 'fas fa-cloud-sun', title: 'Evening Snacks' },
+                { key: 'dinner', icon: 'fas fa-moon', title: 'Dinner' }
+            ];
+            
+            mealTypes.forEach(mealType => {
+                const mealCategory = document.createElement('div');
+                mealCategory.className = 'meal-category';
+                
+                const mealTitle = document.createElement('div');
+                mealTitle.className = 'meal-title';
+                
+                const mealIcon = document.createElement('i');
+                mealIcon.className = `meal-icon ${mealType.icon}`;
+                
+                const mealLabel = document.createElement('span');
+                mealLabel.textContent = mealType.title;
+                
+                mealTitle.appendChild(mealIcon);
+                mealTitle.appendChild(mealLabel);
+                
+                const mealContent = document.createElement('div');
+                mealContent.className = 'meal-content';
+                mealContent.textContent = meals[mealType.key];
+                
+                mealCategory.appendChild(mealTitle);
+                mealCategory.appendChild(mealContent);
+                mealsContainer.appendChild(mealCategory);
+            });
+            
+            dayElement.appendChild(dayHeader);
+            dayElement.appendChild(mealsContainer);
+            planGrid.appendChild(dayElement);
+        });
+    }
+
+    function generateModalMealPlan() {
+        const userGender = "{{ user.gender }}";
+        const planGrid = document.getElementById('modal-meal-plan-grid');
+        const currentWeekElement = document.getElementById('modal-current-week');
+        
+        // Set current week display
+        const weekEnd = new Date(currentWeekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        currentWeekElement.textContent = `Week of ${currentWeekStart.toLocaleDateString('en-US', options)}`;
+        
+        // Clear previous plan
+        planGrid.innerHTML = '';
+        
+        // Generate meal plan for each day
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        days.forEach((day, index) => {
+            const currentDate = new Date(currentWeekStart);
+            currentDate.setDate(currentDate.getDate() + index);
+            
+            const dayElement = document.createElement('div');
+            dayElement.className = 'modal-meal-day';
+            
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'modal-day-header';
+            
+            const dayName = document.createElement('div');
+            dayName.className = 'modal-day-name';
+            dayName.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            
+            const dayDate = document.createElement('div');
+            dayDate.className = 'modal-day-date';
+            dayDate.textContent = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            dayHeader.appendChild(dayName);
+            dayHeader.appendChild(dayDate);
+            
+            const mealsContainer = document.createElement('div');
+            mealsContainer.className = 'modal-meals-container';
+            
+            // Add meals for the day
+            const meals = mealPlans[userGender][day];
+            const mealTypes = [
+                { key: 'morning', icon: 'fas fa-sun', title: 'Breakfast' },
+                { key: 'lunch', icon: 'fas fa-utensils', title: 'Lunch' },
+                { key: 'evening', icon: 'fas fa-cloud-sun', title: 'Evening Snacks' },
+                { key: 'dinner', icon: 'fas fa-moon', title: 'Dinner' }
+            ];
+            
+            mealTypes.forEach(mealType => {
+                const mealCategory = document.createElement('div');
+                mealCategory.className = 'modal-meal-category';
+                
+                const mealTitle = document.createElement('div');
+                mealTitle.className = 'modal-meal-title';
+                
+                const mealIcon = document.createElement('i');
+                mealIcon.className = `modal-meal-icon ${mealType.icon}`;
+                
+                const mealLabel = document.createElement('span');
+                mealLabel.textContent = mealType.title;
+                
+                mealTitle.appendChild(mealIcon);
+                mealTitle.appendChild(mealLabel);
+                
+                const mealContent = document.createElement('div');
+                mealContent.className = 'modal-meal-content';
+                mealContent.textContent = meals[mealType.key];
+                
+                mealCategory.appendChild(mealTitle);
+                mealCategory.appendChild(mealContent);
+                mealsContainer.appendChild(mealCategory);
+            });
+            
+            dayElement.appendChild(dayHeader);
+            dayElement.appendChild(mealsContainer);
+            planGrid.appendChild(dayElement);
+        });
+    }
+    
+    function navigateWeek(direction) {
+        if (direction === 'prev') {
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+        } else if (direction === 'next') {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        }
+        generateMealPlan();
+        generateModalMealPlan();
+    }
+    
+    function downloadMealPlan() {
+        const userGender = "{{ user.gender }}";
+        const userName = "{{ user.name }}";
+        
+        let content = `Weekly Meal Plan for ${userName} (${userGender})\n\n`;
+        content += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+        
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        days.forEach(day => {
+            content += `✅ ${day.charAt(0).toUpperCase() + day.slice(1)}\n`;
+            const meals = mealPlans[userGender][day];
+            content += `   • Morning: ${meals.morning}\n`;
+            content += `   • Lunch: ${meals.lunch}\n`;
+            content += `   • Evening: ${meals.evening}\n`;
+            content += `   • Dinner: ${meals.dinner}\n\n`;
+        });
+        
+        content += "⸻\n";
+        content += "Note: This is a balanced diet plan. Adjust portions based on individual needs.\n";
+        content += "Stay hydrated and maintain regular physical activity.";
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `meal-plan-${userName}-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Modal functionality
+    function openMealPlannerModal() {
+        const modal = document.getElementById('meal-planner-modal');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Generate modal meal plan
+        generateModalMealPlan();
+    }
+
+    function closeMealPlannerModal() {
+        const modal = document.getElementById('meal-planner-modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Initialize meal planner
+    function initMealPlanner() {
+        generateMealPlan();
+        
+        // Add event listeners
+        document.getElementById('prev-week').addEventListener('click', () => navigateWeek('prev'));
+        document.getElementById('next-week').addEventListener('click', () => navigateWeek('next'));
+        document.getElementById('download-plan').addEventListener('click', downloadMealPlan);
+        document.getElementById('view-full-plan').addEventListener('click', openMealPlannerModal);
+        
+        // Modal event listeners
+        document.getElementById('modal-close').addEventListener('click', closeMealPlannerModal);
+        document.getElementById('modal-prev-week').addEventListener('click', () => navigateWeek('prev'));
+        document.getElementById('modal-next-week').addEventListener('click', () => navigateWeek('next'));
+        document.getElementById('modal-download-plan').addEventListener('click', downloadMealPlan);
+        
+        // Close modal when clicking outside
+        document.getElementById('meal-planner-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMealPlannerModal();
+            }
+        });
+    }
+
+    // Mobile swipe functionality
+    function initSwipeCards() {
+        const swipeContainer = document.querySelector('.swipe-container');
+        if (!swipeContainer) return;
+        
+        let startX = 0;
+        let scrollLeft = 0;
+        
+        swipeContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].pageX - swipeContainer.offsetLeft;
+            scrollLeft = swipeContainer.scrollLeft;
+        });
+        
+        swipeContainer.addEventListener('touchmove', (e) => {
+            if (!startX) return;
+            const x = e.touches[0].pageX - swipeContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            swipeContainer.scrollLeft = scrollLeft - walk;
+        });
+    }
+
+    // Collapsible sections
+    function initCollapsibleSections() {
+        const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+        
+        collapsibleHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('expanded');
+                
+                const icon = header.querySelector('i');
+                if (icon) {
+                    if (content.classList.contains('expanded')) {
+                        icon.className = 'fas fa-chevron-up';
+                    } else {
+                        icon.className = 'fas fa-chevron-down';
+                    }
+                }
+            });
+        });
+    }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCurrentDate();
+        updateSleepRiskAssessment();
+        updateHydrationDisplay();
+        updatePeriodDelayWarning();
+        
+        // Initialize enhanced calendar for female users
+        {% if user.gender == 'female' %}
+        initEnhancedCalendar();
+        {% endif %}
+        
+        // Initialize meal planner
+        initMealPlanner();
+
+        // Add subtle animation to cards on load
+        const cards = document.querySelectorAll('.tracker-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.animation = `cardSlideIn 0.5s ease ${index * 0.1}s both`;
+        });
+
+        // Initialize mobile features
+        initSwipeCards();
+        initCollapsibleSections();
+    });
+</script>
+</body>
+</html>

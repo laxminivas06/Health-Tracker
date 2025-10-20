@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker - Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5a52d5;
+            --primary-light: #f0f0ff;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+            --gray: #777;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            line-height: 1.6;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 30px 25px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            font-size: 30px;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 15px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .auth-form {
+            text-align: left;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin: 0 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--primary-light);
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 14px 14px 42px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: var(--light-gray);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+            outline: none;
+            background-color: white;
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 17px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 17px;
+            z-index: 2;
+        }
+
+        .password-requirements {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            color: var(--gray);
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .requirement i {
+            margin-right: 6px;
+            width: 14px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .requirement.valid {
+            color: var(--success);
+        }
+
+        .requirement.invalid {
+            color: var(--gray);
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 4px;
+            margin-top: 8px;
+            background-color: var(--light-gray);
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak {
+            background-color: var(--error);
+            width: 33%;
+        }
+
+        .strength-medium {
+            background-color: var(--warning);
+            width: 66%;
+        }
+
+        .strength-strong {
+            background-color: var(--success);
+            width: 100%;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-link {
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .auth-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+
+        .confirm-message {
+            margin-top: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: var(--error);
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--error);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.5s ease-in-out;
+            font-size: 14px;
+        }
+
+        .error-message i {
+            font-size: 16px;
+        }
+
+        /* Age Display */
+        .age-display {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: var(--primary-light);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary-dark);
+            text-align: center;
+            display: none;
+        }
+
+        /* Calendar Icon for Date Input */
+        .date-input-container {
+            position: relative;
+        }
+
+        .date-clear {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 2;
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress indicator */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border);
+            z-index: 1;
+        }
+
+        .step {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .step.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .step.completed {
+            border-color: var(--success);
+            background-color: var(--success);
+            color: white;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 25px 20px;
+            }
+
+            .logo {
+                font-size: 26px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+
+            .auth-container {
+                max-width: 100%;
+            }
+
+            .auth-card {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .tagline {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 12px 12px 12px 38px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+
+            .password-requirements {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .requirement {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .auth-card {
+                padding: 18px 12px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 10px 10px 10px 35px;
+                font-size: 14px;
+            }
+
+            .form-icon {
+                left: 12px;
+                font-size: 15px;
+            }
+
+            .password-toggle {
+                right: 12px;
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 11px;
+                font-size: 14px;
+            }
+
+            .progress-steps {
+                margin-bottom: 20px;
+            }
+
+            .step {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .auth-card {
+                padding: 15px 10px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .tagline {
+                font-size: 13px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 9px 9px 9px 32px;
+                font-size: 13px;
+            }
+
+            .form-icon {
+                left: 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Focus states for accessibility */
+        .form-group input:focus ~ .form-icon,
+        .form-group select:focus ~ .form-icon {
+            color: var(--primary);
+        }
+
+        /* Custom select styling */
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+        }
+
+        /* Date input styling */
+        input[type="date"] {
+            position: relative;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            opacity: 0.6;
+            z-index: 1;
+        }
+
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-clear-button {
+            display: none;
+        }
+
+        /* Compact layout for very small screens */
+        .compact .form-group {
+            margin-bottom: 12px;
+        }
+
+        .compact .form-section {
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>Register</span>
+            </h1>
+            
+            <p class="tagline">Create your account to start tracking your health journey</p>
+            
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+            </div>
+            
+            <form method="POST" class="auth-form" id="registerForm">
+                <!-- User Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        <span>User Information</span>
+                    </h3>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-user form-icon"></i>
+                        <input type="text" name="name" id="name" placeholder="Full Name" required value="{{ request.form.name if request.form }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-envelope form-icon"></i>
+                        <input type="email" name="email" id="email" placeholder="Email Address" required value="{{ request.form.email if request.form }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-lock form-icon"></i>
+                        <input type="password" name="password" id="password" placeholder="Password" required>
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                        
+                        <div class="password-requirements">
+                            <p style="margin-bottom: 8px; font-weight: 600;">Password must contain:</p>
+                            <div class="requirement invalid" id="lengthReq">
+                                <i class="fas fa-times"></i>
+                                At least 8 characters
+                            </div>
+                            <div class="requirement invalid" id="uppercaseReq">
+                                <i class="fas fa-times"></i>
+                                One uppercase letter
+                            </div>
+                            <div class="requirement invalid" id="lowercaseReq">
+                                <i class="fas fa-times"></i>
+                                One lowercase letter
+                            </div>
+                            <div class="requirement invalid" id="numberReq">
+                                <i class="fas fa-times"></i>
+                                One number
+                            </div>
+                            <div class="requirement invalid" id="specialReq">
+                                <i class="fas fa-times"></i>
+                                One special character
+                            </div>
+                            
+                            <div class="password-strength">
+                                <div class="strength-bar" id="strengthBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-lock form-icon"></i>
+                        <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm Password" required>
+                        <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                        <div id="confirmMessage" class="confirm-message"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <i class="fas fa-venus-mars form-icon"></i>
+                            <select name="gender" id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="female" {% if request.form and request.form.gender == 'female' %}selected{% endif %}>Female</option>
+                                <option value="male" {% if request.form and request.form.gender == 'male' %}selected{% endif %}>Male</option>
+                                <option value="other" {% if request.form and request.form.gender == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group date-input-container">
+                            <i class="fas fa-calendar form-icon"></i>
+                            <input type="date" name="dob" id="dob" placeholder="Date of Birth" required max="{{ today }}" value="{{ request.form.dob if request.form }}">
+                            <i class="fas fa-times date-clear" id="clearDob" title="Clear date"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="age-display" id="ageDisplay">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span id="ageText">Age: </span>
+                    </div>
+                </div>
+                
+                <!-- Parent Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-users"></i>
+                        <span>Parent Information</span>
+                    </h3>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-user form-icon"></i>
+                        <input type="text" name="parent_name" id="parentName" placeholder="Parent's Full Name" required value="{{ request.form.parent_name if request.form }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-envelope form-icon"></i>
+                        <input type="email" name="parent_email" id="parentEmail" placeholder="Parent's Email Address" required value="{{ request.form.parent_email if request.form }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-lock form-icon"></i>
+                        <input type="password" name="parent_password" id="parentPassword" placeholder="Parent's Password" required>
+                        <i class="fas fa-eye password-toggle" id="toggleParentPassword"></i>
+                        
+                        <div class="password-requirements">
+                            <p style="margin-bottom: 8px; font-weight: 600;">Parent's Password must contain:</p>
+                            <div class="requirement invalid" id="parentLengthReq">
+                                <i class="fas fa-times"></i>
+                                At least 8 characters
+                            </div>
+                            <div class="requirement invalid" id="parentUppercaseReq">
+                                <i class="fas fa-times"></i>
+                                One uppercase letter
+                            </div>
+                            <div class="requirement invalid" id="parentLowercaseReq">
+                                <i class="fas fa-times"></i>
+                                One lowercase letter
+                            </div>
+                            <div class="requirement invalid" id="parentNumberReq">
+                                <i class="fas fa-times"></i>
+                                One number
+                            </div>
+                            <div class="requirement invalid" id="parentSpecialReq">
+                                <i class="fas fa-times"></i>
+                                One special character
+                            </div>
+                            
+                            <div class="password-strength">
+                                <div class="strength-bar" id="parentStrengthBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <i class="fas fa-lock form-icon"></i>
+                        <input type="password" name="parent_confirm_password" id="parentConfirmPassword" placeholder="Confirm Parent's Password" required>
+                        <i class="fas fa-eye password-toggle" id="toggleParentConfirmPassword"></i>
+                        <div id="parentConfirmMessage" class="confirm-message"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                    <span id="btnText">Create Account</span>
+                    <div class="loading" id="loadingSpinner" style="display: none;"></div>
+                </button>
+            </form>
+            
+            <p class="auth-link">
+                Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set max date to today for DOB
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dob').setAttribute('max', today);
+            
+            // User password elements
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            const confirmMessage = document.getElementById('confirmMessage');
+            const strengthBar = document.getElementById('strengthBar');
+            
+            // User password requirements elements
+            const lengthReq = document.getElementById('lengthReq');
+            const uppercaseReq = document.getElementById('uppercaseReq');
+            const lowercaseReq = document.getElementById('lowercaseReq');
+            const numberReq = document.getElementById('numberReq');
+            const specialReq = document.getElementById('specialReq');
+            
+            // Parent password elements
+            const parentPasswordInput = document.getElementById('parentPassword');
+            const parentConfirmPasswordInput = document.getElementById('parentConfirmPassword');
+            const toggleParentPassword = document.getElementById('toggleParentPassword');
+            const toggleParentConfirmPassword = document.getElementById('toggleParentConfirmPassword');
+            const parentConfirmMessage = document.getElementById('parentConfirmMessage');
+            const parentStrengthBar = document.getElementById('parentStrengthBar');
+            
+            // Parent password requirements elements
+            const parentLengthReq = document.getElementById('parentLengthReq');
+            const parentUppercaseReq = document.getElementById('parentUppercaseReq');
+            const parentLowercaseReq = document.getElementById('parentLowercaseReq');
+            const parentNumberReq = document.getElementById('parentNumberReq');
+            const parentSpecialReq = document.getElementById('parentSpecialReq');
+            
+            // DOB and Age elements
+            const dobInput = document.getElementById('dob');
+            const clearDob = document.getElementById('clearDob');
+            const ageDisplay = document.getElementById('ageDisplay');
+            const ageText = document.getElementById('ageText');
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Toggle password visibility functions
+            function setupPasswordToggle(passwordInput, toggleIcon) {
+                toggleIcon.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+            
+            // Set up all password toggles
+            setupPasswordToggle(passwordInput, togglePassword);
+            setupPasswordToggle(confirmPasswordInput, toggleConfirmPassword);
+            setupPasswordToggle(parentPasswordInput, toggleParentPassword);
+            setupPasswordToggle(parentConfirmPasswordInput, toggleParentConfirmPassword);
+            
+            // Calculate age from DOB
+            function calculateAge(dob) {
+                const birthDate = new Date(dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                return age;
+            }
+            
+            // Update age display
+            function updateAgeDisplay() {
+                const dob = dobInput.value;
+                if (dob) {
+                    const age = calculateAge(dob);
+                    ageText.textContent = `Age: ${age} years`;
+                    ageDisplay.style.display = 'block';
+                    
+                    // Validate age (1-120 years)
+                    if (age < 1 || age > 120) {
+                        ageDisplay.style.background = '#ffebee';
+                        ageDisplay.style.color = 'var(--error)';
+                        return false;
+                    } else {
+                        ageDisplay.style.background = 'var(--primary-light)';
+                        ageDisplay.style.color = 'var(--primary-dark)';
+                        return true;
+                    }
+                } else {
+                    ageDisplay.style.display = 'none';
+                    return false;
+                }
+            }
+            
+            // DOB input handler
+            dobInput.addEventListener('change', function() {
+                updateAgeDisplay();
+                validateForm();
+                
+                // Show/hide clear button
+                if (this.value) {
+                    clearDob.style.display = 'block';
+                } else {
+                    clearDob.style.display = 'none';
+                }
+            });
+            
+            // Clear DOB
+            clearDob.addEventListener('click', function() {
+                dobInput.value = '';
+                ageDisplay.style.display = 'none';
+                clearDob.style.display = 'none';
+                validateForm();
+            });
+            
+            // Validate password on input
+            function setupPasswordValidation(passwordInput, requirements, strengthBar, confirmInput, confirmMessage) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    
+                    // Check password requirements
+                    const hasMinLength = password.length >= 8;
+                    const hasUppercase = /[A-Z]/.test(password);
+                    const hasLowercase = /[a-z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+                    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                    
+                    // Update requirement indicators
+                    updateRequirement(requirements.length, hasMinLength);
+                    updateRequirement(requirements.uppercase, hasUppercase);
+                    updateRequirement(requirements.lowercase, hasLowercase);
+                    updateRequirement(requirements.number, hasNumber);
+                    updateRequirement(requirements.special, hasSpecial);
+                    
+                    // Calculate password strength
+                    let strength = 0;
+                    if (hasMinLength) strength += 20;
+                    if (hasUppercase) strength += 20;
+                    if (hasLowercase) strength += 20;
+                    if (hasNumber) strength += 20;
+                    if (hasSpecial) strength += 20;
+                    
+                    // Update strength bar
+                    updateStrengthBar(strengthBar, strength);
+                    
+                    // Check if passwords match
+                    if (confirmInput) {
+                        checkPasswordMatch(passwordInput, confirmInput, confirmMessage);
+                    }
+                    
+                    // Enable/disable submit button based on validation
+                    validateForm();
+                });
+            }
+            
+            // Set up password validation for both user and parent
+            setupPasswordValidation(
+                passwordInput, 
+                { length: lengthReq, uppercase: uppercaseReq, lowercase: lowercaseReq, number: numberReq, special: specialReq },
+                strengthBar,
+                confirmPasswordInput,
+                confirmMessage
+            );
+            
+            setupPasswordValidation(
+                parentPasswordInput, 
+                { length: parentLengthReq, uppercase: parentUppercaseReq, lowercase: parentLowercaseReq, number: parentNumberReq, special: parentSpecialReq },
+                parentStrengthBar,
+                parentConfirmPasswordInput,
+                parentConfirmMessage
+            );
+            
+            // Check password match on confirm password input
+            confirmPasswordInput.addEventListener('input', function() {
+                checkPasswordMatch(passwordInput, confirmPasswordInput, confirmMessage);
+            });
+            
+            parentConfirmPasswordInput.addEventListener('input', function() {
+                checkPasswordMatch(parentPasswordInput, parentConfirmPasswordInput, parentConfirmMessage);
+            });
+            
+            function updateRequirement(element, isValid) {
+                if (isValid) {
+                    element.classList.remove('invalid');
+                    element.classList.add('valid');
+                    element.querySelector('i').className = 'fas fa-check';
+                } else {
+                    element.classList.remove('valid');
+                    element.classList.add('invalid');
+                    element.querySelector('i').className = 'fas fa-times';
+                }
+            }
+            
+            function updateStrengthBar(strengthBarElement, strength) {
+                strengthBarElement.className = 'strength-bar';
+                
+                if (strength <= 33) {
+                    strengthBarElement.classList.add('strength-weak');
+                } else if (strength <= 66) {
+                    strengthBarElement.classList.add('strength-medium');
+                } else {
+                    strengthBarElement.classList.add('strength-strong');
+                }
+            }
+            
+            function checkPasswordMatch(passwordInput, confirmInput, messageElement) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmInput.value;
+                
+                if (confirmPassword === '') {
+                    messageElement.textContent = '';
+                    messageElement.style.color = '';
+                    confirmInput.style.borderColor = '';
+                } else if (password === confirmPassword) {
+                    messageElement.textContent = 'Passwords match!';
+                    messageElement.style.color = 'var(--success)';
+                    confirmInput.style.borderColor = 'var(--success)';
+                } else {
+                    messageElement.textContent = 'Passwords do not match!';
+                    messageElement.style.color = 'var(--error)';
+                    confirmInput.style.borderColor = 'var(--error)';
+                }
+                
+                // Enable/disable submit button based on validation
+                validateForm();
+            }
+            
+            function validateForm() {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const gender = document.getElementById('gender').value;
+                const dob = dobInput.value;
+                const parentName = document.getElementById('parentName').value;
+                const parentEmail = document.getElementById('parentEmail').value;
+                const parentPassword = parentPasswordInput.value;
+                const parentConfirmPassword = parentConfirmPasswordInput.value;
+                
+                // Check if all user password requirements are met
+                const hasMinLength = password.length >= 8;
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasLowercase = /[a-z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                const userPasswordsMatch = password === confirmPassword && password !== '';
+                
+                // Check if all parent password requirements are met
+                const parentHasMinLength = parentPassword.length >= 8;
+                const parentHasUppercase = /[A-Z]/.test(parentPassword);
+                const parentHasLowercase = /[a-z]/.test(parentPassword);
+                const parentHasNumber = /[0-9]/.test(parentPassword);
+                const parentHasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(parentPassword);
+                const parentPasswordsMatch = parentPassword === parentConfirmPassword && parentPassword !== '';
+                
+                // Check age validation
+                const ageValid = updateAgeDisplay();
+                
+                // Enable submit button only if all conditions are met
+                if (name && email && gender && dob && parentName && parentEmail &&
+                    hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecial && userPasswordsMatch &&
+                    parentHasMinLength && parentHasUppercase && parentHasLowercase && parentHasNumber && parentHasSpecial && parentPasswordsMatch &&
+                    ageValid) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+            
+            // Validate form on all input changes
+            document.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', validateForm);
+                element.addEventListener('change', validateForm);
+            });
+            
+            // Form submission with loading state
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                // Show loading state
+                btnText.textContent = 'Creating Account...';
+                loadingSpinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+                
+                // The form will submit normally to Flask backend
+                // Loading state is just for visual feedback
+            });
+            
+            // Add focus animations
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Auto-focus first field
+            document.getElementById('name').focus();
+            
+            // Add compact class for very small screens
+            function checkScreenSize() {
+                if (window.innerWidth <= 320) {
+                    document.body.classList.add('compact');
+                } else {
+                    document.body.classList.remove('compact');
+                }
+            }
+            
+            window.addEventListener('resize', checkScreenSize);
+            checkScreenSize();
+        });
+    </script>
+</body>
+</html>

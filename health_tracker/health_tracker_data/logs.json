@@ -1,0 +1,58 @@
+{
+    "user_1": {
+        "2025-10-11": {
+            "meals": {
+                "morning": "",
+                "afternoon": "",
+                "evening": "",
+                "dinner_snacks": ""
+            },
+            "water_ml": 0,
+            "sleep_hours": 0,
+            "tasks": "",
+            "period": {
+                "start": "",
+                "end": "",
+                "notes": ""
+            },
+            "last_updated": {
+                "breakfast": "",
+                "lunch": "",
+                "evening": "",
+                "dinner": "",
+                "water": "",
+                "sleep": "",
+                "tasks": "",
+                "period": ""
+            }
+        }
+    },
+    "user_2": {
+        "2025-10-11": {
+            "meals": {
+                "morning": "",
+                "afternoon": "",
+                "evening": "",
+                "dinner_snacks": ""
+            },
+            "water_ml": 0,
+            "sleep_hours": 0,
+            "tasks": "",
+            "period": {
+                "start": "",
+                "end": "",
+                "notes": ""
+            },
+            "last_updated": {
+                "breakfast": "",
+                "lunch": "",
+                "evening": "",
+                "dinner": "",
+                "water": "",
+                "sleep": "",
+                "tasks": "",
+                "period": ""
+            }
+        }
+    }
+}

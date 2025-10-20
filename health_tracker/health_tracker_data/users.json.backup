@@ -1,0 +1,13 @@
+{
+    "user_1": {
+        "name": "nivas mm",
+        "email": "morishettylaxminivas@gmail.com",
+        "password": "9723fa7e292c9726d334744df91c70280b8ba297ae0b49468e2f93b57bcd92de",
+        "gender": "female",
+        "age": 12,
+        "parent_name": "Nivasm",
+        "parent_email": "morishettylaxminivas@gmail.com",
+        "parent_password": "9723fa7e292c9726d334744df91c70280b8ba297ae0b49468e2f93b57bcd92de",
+        "created_at": "2025-10-11 10:54:31"
+    }
+}

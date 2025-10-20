@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5a52d5;
+            --primary-light: #f0f0ff;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --gray: #777;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 40px 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 36px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: var(--error);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--error);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message i {
+            font-size: 18px;
+        }
+
+        .auth-form {
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: var(--light-gray);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+            outline: none;
+            background-color: white;
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 18px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--gray);
+            transition: color 0.3s;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-link {
+            margin-top: 25px;
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .auth-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider span {
+            padding: 0 15px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .social-btn:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .social-btn.google {
+            color: #db4437;
+        }
+
+        .social-btn.facebook {
+            color: #4267B2;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+
+            .logo {
+                font-size: 28px;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .auth-card {
+                padding: 25px 15px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .form-group input {
+                padding: 12px 12px 12px 40px;
+            }
+
+            .btn {
+                padding: 12px;
+            }
+        }
+
+        /* Feature highlights */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .feature i {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span class="logo-text">Health Tracker</span>
+            </h1>
+            
+            <p class="tagline">Track your health, monitor progress, and achieve your wellness goals</p>
+            
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <i class="fas fa-envelope form-icon"></i>
+                    <input type="email" name="email" id="email" placeholder="Email address" required value="{{ request.form.email if request.form }}">
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-lock form-icon"></i>
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                    <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="parent_login" id="parentLogin" {% if request.form and request.form.parent_login %}checked{% endif %}>
+                        Login as Parent
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span id="btnText">Login</span>
+                    <div class="loading" id="loadingSpinner" style="display: none;"></div>
+                </button>
+            </form>
+            
+            
+            
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Track Progress</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-utensils"></i>
+                    <span>Meal Planning</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-bed"></i>
+                    <span>Sleep Tracking</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-tint"></i>
+                    <span>Hydration</span>
+                </div>
+            </div>
+            
+            <p class="auth-link">
+                Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const parentLogin = document.getElementById('parentLogin');
+
+            // Toggle password visibility
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Form submission with loading state
+            loginForm.addEventListener('submit', function(e) {
+                // Show loading state
+                btnText.textContent = 'Logging in...';
+                loadingSpinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+
+                // In a real application, you would send the form data to the server here
+                // For demo purposes, we'll simulate a delay
+                setTimeout(function() {
+                    // Reset button state (in real app, this would happen after server response)
+                    btnText.textContent = 'Login';
+                    loadingSpinner.style.display = 'none';
+                    submitBtn.disabled = false;
+                }, 2000);
+            });
+
+            // Update form based on parent login selection
+            parentLogin.addEventListener('change', function() {
+                if (this.checked) {
+                    // Update UI for parent login
+                    document.querySelector('.tagline').textContent = 'Monitor your child\'s health and wellness progress';
+                } else {
+                    // Update UI for regular user login
+                    document.querySelector('.tagline').textContent = 'Track your health, monitor progress, and achieve your wellness goals';
+                }
+            });
+
+            // Add focus animations
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // Demo social login buttons
+            document.querySelectorAll('.social-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const provider = this.classList.contains('google') ? 'Google' : 'Facebook';
+                    alert(`${provider} login would be implemented here in a real application`);
+                });
+            });
+
+            // Auto-focus email field
+            document.getElementById('email').focus();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "user_1": {
+        "name": "nivas mm",
+        "email": "morishettylaxminivas@gmail.com",
+        "password": "9723fa7e292c9726d334744df91c70280b8ba297ae0b49468e2f93b57bcd92de",
+        "gender": "female",
+        "age": 12,
+        "parent_name": "Nivasm",
+        "parent_email": "morishettylaxminivas@gmail.com",
+        "parent_password": "9723fa7e292c9726d334744df91c70280b8ba297ae0b49468e2f93b57bcd92de",
+        "created_at": "2025-10-11 10:54:31"
+    },
+    "user_2": {
+        "name": "C Govardhini Reddy",
+        "email": "govardhinireddychirraiahgari@gmail.com",
+        "password": "84352c9bb0ea32a7abd248953ed2470824beda0e60fe89e2691a20ff17cfe707",
+        "gender": "female",
+        "age": 19,
+        "parent_name": "C Gokul Reddy",
+        "parent_email": "govardhinireddychirraiahgari@gmail.com",
+        "parent_password": "84352c9bb0ea32a7abd248953ed2470824beda0e60fe89e2691a20ff17cfe707",
+        "created_at": "2025-10-11 11:00:25"
+    }
+}
